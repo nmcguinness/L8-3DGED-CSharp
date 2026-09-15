@@ -95,7 +95,7 @@ A dictionary has no meaningful order. Iterating one gives you the entries in an 
 ```csharp
 foreach (KeyValuePair<string, int> entry in ammunition)
 {
-    Debug.Log(entry.Key + ": " + entry.Value);
+    Console.WriteLine(entry.Key + ": " + entry.Value);
 }
 ```
 

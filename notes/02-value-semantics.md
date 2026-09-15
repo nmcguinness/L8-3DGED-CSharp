@@ -68,13 +68,13 @@ PositionClass a = new PositionClass();
 a.X = 1f;
 PositionClass b = a;
 b.X = 99f;
-Debug.Log(a.X);             // 99 - a and b are the same object
+Console.WriteLine(a.X);             // 99 - a and b are the same object
 
 PositionStruct c = new PositionStruct();
 c.X = 1f;
 PositionStruct d = c;
 d.X = 99f;
-Debug.Log(c.X);             // 1 - d was a copy
+Console.WriteLine(c.X);             // 1 - d was a copy
 ```
 
 The same rule applies to method arguments. Passing a struct to a method passes a copy, so a method that modifies its struct parameter modifies nothing the caller can see:

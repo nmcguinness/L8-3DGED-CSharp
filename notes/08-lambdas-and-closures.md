@@ -41,7 +41,7 @@ Start from a named method used as a callback:
 ```csharp
 private void LogDamage(int amount)
 {
-    Debug.Log("Took " + amount + " damage");
+    Console.WriteLine("Took " + amount + " damage");
 }
 
 // elsewhere
@@ -51,13 +51,13 @@ _health.HealthChanged += LogDamage;
 The lambda form puts the body at the call site. `=>` separates the parameters from the body.
 
 ```csharp
-_health.HealthChanged += (int amount) => { Debug.Log("Took " + amount + " damage"); };
+_health.HealthChanged += (int amount) => { Console.WriteLine("Took " + amount + " damage"); };
 ```
 
 Two pieces of that are noise. The parameter type can be inferred from the delegate, and a single-expression body needs no braces:
 
 ```csharp
-_health.HealthChanged += amount => Debug.Log("Took " + amount + " damage");
+_health.HealthChanged += amount => Console.WriteLine("Took " + amount + " damage");
 ```
 
 That is the form you will normally write. The rules:
@@ -79,7 +79,7 @@ Nothing new is being introduced here. A lambda is just another way to produce th
 ```csharp
 Action reset = () => _score = 0;
 
-Action<int> log = amount => Debug.Log(amount);
+Action<int> log = amount => Console.WriteLine(amount);
 
 Func<int, int> doubled = value => value * 2;
 
@@ -97,11 +97,11 @@ int threshold = 50;
 
 Func<Enemy, bool> isWounded = enemy => enemy.Health < threshold;
 
-Debug.Log(isWounded(goblin));    // compares against 50
+Console.WriteLine(isWounded(goblin));    // compares against 50
 
 threshold = 10;
 
-Debug.Log(isWounded(goblin));    // compares against 10
+Console.WriteLine(isWounded(goblin));    // compares against 10
 ```
 
 `threshold` was 50 when the lambda was created, but the second call uses 10. The lambda did not take a snapshot. It captured `threshold` itself, and it reads the current value each time it runs.
@@ -123,7 +123,7 @@ List<Action> callbacks = new List<Action>();
 
 for (int i = 0; i < 3; i++)
 {
-    callbacks.Add(() => Debug.Log(i));
+    callbacks.Add(() => Console.WriteLine(i));
 }
 
 foreach (Action callback in callbacks)
@@ -142,7 +142,7 @@ The fix is to give each iteration its own variable to capture:
 for (int i = 0; i < 3; i++)
 {
     int index = i;                            // a new variable each iteration
-    callbacks.Add(() => Debug.Log(index));
+    callbacks.Add(() => Console.WriteLine(index));
 }
 ```
 
@@ -153,7 +153,7 @@ Now each lambda captures a different `index`, and the output is `0 1 2`.
 ```csharp
 foreach (Enemy enemy in enemies)
 {
-    callbacks.Add(() => Debug.Log(enemy.name));   // correct: one enemy each
+    callbacks.Add(() => Console.WriteLine(enemy.Name));   // correct: one enemy each
 }
 ```
 

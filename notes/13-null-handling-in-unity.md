@@ -105,8 +105,8 @@ Enemy enemy = GetEnemy();
 Destroy(enemy);
 
 // Later, after the destruction has been processed
-Debug.Log(enemy == null);                       // True
-Debug.Log(ReferenceEquals(enemy, null));        // False
+Console.WriteLine(enemy == null);                       // True
+Console.WriteLine(ReferenceEquals(enemy, null));        // False
 ```
 
 Both lines are asking about the same reference and they disagree. `==` runs Unity's overload, which checks whether the native object behind the wrapper still exists and reports `true` when it does not. `ReferenceEquals` does a genuine reference comparison and correctly reports that the reference is not null.
