@@ -4,8 +4,8 @@ subtitle: "COMP I8014 — Stage 3 3DGED"
 topic_code: t05_interfaces
 description: "Programming to a contract rather than a concrete type, implementing several interfaces, keeping them small, and resolving a collision with explicit implementation."
 created: 2026-09-15
-last_updated: 2026-09-15
-version: 1.0
+last_updated: 2026-09-23
+version: 1.1
 status: published
 authors: ["3DGED Teaching Team"]
 tags: [csharp, interfaces, contracts, polymorphism, interface-segregation, explicit-implementation, stage3, comp-i8014]
@@ -77,7 +77,23 @@ Two unrelated types can both satisfy it. They share no base class and nothing el
 ```csharp
 public class Barrel : IDamageable
 {
-    private int _integrity = 20;
+    private int _integrity;
+
+    /// <summary>
+    /// Creates a barrel at the standard integrity of 20.
+    /// </summary>
+    public Barrel() : this(20)
+    {
+    }
+
+    /// <summary>
+    /// Creates a barrel with the given starting integrity.
+    /// </summary>
+    /// <param name="integrity">The starting integrity.</param>
+    public Barrel(int integrity)
+    {
+        _integrity = integrity;
+    }
 
     /// <inheritdoc />
     public void TakeDamage(int amount)
@@ -94,12 +110,34 @@ public class Barrel : IDamageable
     {
         // Spawn effect, remove from the scene.
     }
+
+    /// <inheritdoc />
+    public override string ToString()
+    {
+        return "Barrel(integrity=" + _integrity + ")";
+    }
 }
 
 public class Enemy : IDamageable
 {
-    private int _health = 100;
+    private int _health;
     private bool _isAlerted;
+
+    /// <summary>
+    /// Creates an enemy at full health.
+    /// </summary>
+    public Enemy() : this(100)
+    {
+    }
+
+    /// <summary>
+    /// Creates an enemy with the given starting health.
+    /// </summary>
+    /// <param name="health">The starting health.</param>
+    public Enemy(int health)
+    {
+        _health = health;
+    }
 
     /// <inheritdoc />
     public void TakeDamage(int amount)
@@ -107,10 +145,18 @@ public class Enemy : IDamageable
         _health -= amount;
         _isAlerted = true;
     }
+
+    /// <inheritdoc />
+    public override string ToString()
+    {
+        return "Enemy(health=" + _health + ", alerted=" + _isAlerted + ")";
+    }
 }
 ```
 
 The implementing member must be `public`, even though the interface did not say so. The `<inheritdoc />` tag tells the documentation tooling to reuse the comment from the interface, so the contract is described in exactly one place.
+
+Neither the constructors nor `ToString` have anything to do with the interface. They are the ordinary work of [note 01](01-properties-static-tostring.md), and they are here because you will want them the first time a damaged barrel behaves oddly: the constructor lets a test start the barrel at 1 integrity rather than 20, and `ToString` means `Console.WriteLine(target)` prints the state instead of the type name. An interface says nothing about either, which is the point - it constrains `TakeDamage` and leaves the rest of the type alone.
 
 ### Programming to the interface
 
@@ -168,7 +214,23 @@ public interface IRepairable
 
 public class Door : IDamageable, IRepairable
 {
-    private int _integrity = 50;
+    private int _integrity;
+
+    /// <summary>
+    /// Creates a door at the standard integrity of 50.
+    /// </summary>
+    public Door() : this(50)
+    {
+    }
+
+    /// <summary>
+    /// Creates a door with the given starting integrity.
+    /// </summary>
+    /// <param name="integrity">The starting integrity.</param>
+    public Door(int integrity)
+    {
+        _integrity = integrity;
+    }
 
     /// <inheritdoc />
     public void TakeDamage(int amount)
@@ -180,6 +242,12 @@ public class Door : IDamageable, IRepairable
     public void Repair(int amount)
     {
         _integrity += amount;
+    }
+
+    /// <inheritdoc />
+    public override string ToString()
+    {
+        return "Door(integrity=" + _integrity + ")";
     }
 }
 ```
@@ -253,6 +321,22 @@ public class Turret : IState, IPoolable
     private int _ammunition;
     private float _timeInState;
 
+    /// <summary>
+    /// Creates a turret with a full magazine of 30 rounds.
+    /// </summary>
+    public Turret() : this(30)
+    {
+    }
+
+    /// <summary>
+    /// Creates a turret with the given ammunition.
+    /// </summary>
+    /// <param name="ammunition">The rounds this turret starts with.</param>
+    public Turret(int ammunition)
+    {
+        _ammunition = ammunition;
+    }
+
     void IState.Reset()
     {
         _timeInState = 0f;
@@ -263,8 +347,16 @@ public class Turret : IState, IPoolable
         _timeInState = 0f;
         _ammunition = 0;
     }
+
+    /// <inheritdoc />
+    public override string ToString()
+    {
+        return "Turret(ammunition=" + _ammunition + ", timeInState=" + _timeInState + "s)";
+    }
 }
 ```
+
+`ToString` is a normal public member, so it stays visible on the concrete type. The two `Reset` bodies do not, which is the distinction the next two blocks turn on.
 
 Note what is missing: explicitly implemented members take no access modifier. The interface name in front of the method is what marks them. They are also not visible on the concrete type, so this will not compile:
 
