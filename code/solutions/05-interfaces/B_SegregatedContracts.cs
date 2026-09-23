@@ -11,6 +11,10 @@
 //
 // Each system method takes the narrowest contract that does its job, so the
 // compiler rather than a comment enforces which types may be passed.
+//
+// Starting condition is set in a constructor rather than in a property
+// initialiser, so a test can start a crate half broken. ToString is for logs and
+// for the debugger; Save is the persisted form. They are deliberately separate.
 
 using System.Collections.Generic;
 
@@ -53,8 +57,20 @@ namespace Solutions.T05.B
     /// <summary>A crate: damageable and repairable, but it neither moves nor saves.</summary>
     public class Crate : IDamageable, IRepairable
     {
+        /// <summary>Creates a crate at full integrity.</summary>
+        public Crate() : this(100)
+        {
+        }
+
+        /// <summary>Creates a crate with the given starting integrity.</summary>
+        /// <param name="integrity">The starting integrity.</param>
+        public Crate(int integrity)
+        {
+            Integrity = integrity;
+        }
+
         /// <summary>Gets the remaining integrity.</summary>
-        public int Integrity { get; private set; } = 100;
+        public int Integrity { get; private set; }
 
         /// <inheritdoc />
         public void TakeDamage(int amount)
@@ -71,13 +87,31 @@ namespace Solutions.T05.B
         {
             Integrity += amount;
         }
+
+        /// <inheritdoc />
+        public override string ToString()
+        {
+            return "Crate(integrity=" + Integrity + ")";
+        }
     }
 
     /// <summary>A guard: damageable, mobile and saved, but never repaired.</summary>
     public class Guard : IDamageable, IMovable, ISaveable
     {
+        /// <summary>Creates a guard at full health.</summary>
+        public Guard() : this(60)
+        {
+        }
+
+        /// <summary>Creates a guard with the given starting health.</summary>
+        /// <param name="health">The starting health.</param>
+        public Guard(int health)
+        {
+            Health = health;
+        }
+
         /// <summary>Gets the remaining health.</summary>
-        public int Health { get; private set; } = 60;
+        public int Health { get; private set; }
 
         /// <summary>Gets how many times this guard has moved.</summary>
         public int MoveCount { get; private set; }
@@ -103,11 +137,29 @@ namespace Solutions.T05.B
         {
             return "guard:" + Health;
         }
+
+        /// <inheritdoc />
+        public override string ToString()
+        {
+            return "Guard(health=" + Health + ", moves=" + MoveCount + ")";
+        }
     }
 
     /// <summary>A checkpoint: saved, and nothing else.</summary>
     public class Checkpoint : ISaveable
     {
+        /// <summary>Creates the first checkpoint, index zero.</summary>
+        public Checkpoint() : this(0)
+        {
+        }
+
+        /// <summary>Creates a checkpoint at the given index.</summary>
+        /// <param name="index">The checkpoint index.</param>
+        public Checkpoint(int index)
+        {
+            Index = index;
+        }
+
         /// <summary>Gets or sets the checkpoint index.</summary>
         public int Index { get; set; }
 
@@ -115,6 +167,12 @@ namespace Solutions.T05.B
         public string Save()
         {
             return "checkpoint:" + Index;
+        }
+
+        /// <inheritdoc />
+        public override string ToString()
+        {
+            return "Checkpoint(index=" + Index + ")";
         }
     }
 
